@@ -13,10 +13,10 @@ class Player:
         self.x -= self.speed
 
     def MoveUp(self):
-        self.y += self.speed
+        self.y -= self.speed
 
     def MoveDown(self):
-        self.y -= self.speed
+        self.y += self.speed
 
 class App:
     window_width = 800
@@ -35,7 +35,8 @@ class App:
 
         pygame.display.set_caption('Pygame pythonspot.com example')
         self._running = True
-        self._image_surf = pygame.image.load("Pygame.png").convert()
+        self._image_surf = pygame.image.load("pygame.png").convert()
+        self._image_surf = pygame.transform.scale(self._image_surf, (20, 20))
 
     def on_event(self, event):
         if (event.type == QUIT):
