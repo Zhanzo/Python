@@ -1,4 +1,5 @@
 from pygame.locals import *
+from random import randint
 import pygame
 import time
 
@@ -15,8 +16,8 @@ class Apple:
         surface.blit(image, (self.x, self.y))
 
 class Player:
-    x = []
-    y = []
+    x = [0]
+    y = [0]
     step = 44
     direction = 0
     length = 3
@@ -26,29 +27,33 @@ class Player:
 
     def __init__(self, length):
         self.length = length
-        for i in range(0, length):
-            self.x.append(0)
-            self.y.append(0)
+        for i in range(0, 2000):
+            self.x.append(-100)
+            self.y.append(-100)
+
+        # initial positions, no collision.
+        self.x[1] = 1*44
+        self.x[2] = 2*44
 
     def update(self):
         self.update_count += 1
         if (self.update_count > self.update_count_max):
             # update previous positions
-            for i in range(self.length-1, 0, -1):
-                print("self.x[" + str(i) + "] = self.x[" + str(i-1) + "]")
+            for i in range(self.length-1,0,-1):
                 self.x[i] = self.x[i-1]
                 self.y[i] = self.y[i-1]
-        
-        if (self.direction == 0):
-            self.x[0] += self.step
-        if (self.direction == 1):
-            self.x[0] -= self.step
-        if (self.direction == 2):
-            self.y[0] -= self.step
-        if (self.direction == 3):
-            self.y[0] += self.step
 
-        self.update_count = 0
+            # update position of head of snake
+            if (self.direction == 0):
+                self.x[0] += self.step
+            if (self.direction == 1):
+                self.x[0] -= self.step
+            if (self.direction == 2):
+                self.y[0] -= self.step
+            if (self.direction == 3):
+                self.y[0] += self.step
+
+            self.update_count = 0
 
     def MoveRight(self):
         self.direction = 0
@@ -65,6 +70,13 @@ class Player:
     def draw(self, surface, image):
         for i in range(0, self.length):
             surface.blit(image, (self.x[i], self.y[i]))
+
+class Game:
+    def isCollision(self, x1, y1, x2, y2, b_size):
+        if (x1 >= x2 and x1 <= x2 + b_size):
+            if (y1 >= y2 and y1 <= y2 + b_size):
+                return True
+        return False
             
 class App:
     window_width = 800
@@ -77,7 +89,8 @@ class App:
         self._display_surf = None
         self._image_surf = None
         self._apple_surf = None
-        self.player = Player(10)
+        self.game = Game()
+        self.player = Player(3)
         self.apple = Apple(5, 5)
 
     def on_init(self):
@@ -86,8 +99,8 @@ class App:
 
         pygame.display.set_caption('Pygame pythonspot.com example')
         self._running = True
-        self._image_surf = pygame.image.load("pygame.png").convert()
-        self._apple_surf = pygame.image.load("apple.png").convert()
+        self._image_surf = pygame.image.load("snake.jpg").convert()
+        self._apple_surf = pygame.image.load("apple.jpg").convert()
 
     def on_event(self, event):
         if (event.type == QUIT):
@@ -95,6 +108,27 @@ class App:
 
     def on_loop(self):
         self.player.update()
+
+        # does snake eat apple?
+        for i in range(0, self.player.length):
+            if (self.game.isCollision(self.apple.x, self.apple.y, self.player.x[i], self.player.y[i], 44)):
+                self.apple.x = randint(2, 9) * 44
+                self.apple.y = randint(2, 9) * 44
+                self.player.length += 1
+                
+        #does snake collide with itself?
+        for i in range(2, self.player.length):
+            if (self.game.isCollision(self.player.x[0], self.player.y[0], self.player.x[i], self.player.y[i], 40)):
+                print("You lose! Collision: ")
+                print("x[0] (" + str(self.player.x[0]) + "," + str(self.player.y[0]) + ")")
+                print("x[" + str(i) + "] (" + str(self.player.x[i]) + "," + str(self.player.y[i]) + ")")
+                exit(0)
+
+        # does snake collide with wall?
+        if (self.player.x[0] >= 800 or self.player.x[0] < 0 or self.player.y[0] >= 600 or self.player.y[0] < 0):
+            print("You lose! Collision with wall!")
+            print("x[0] (" + str(self.player.x[0]) + "," + str(self.player.y[0]) + ")")
+            exit(0)
         pass
 
     def on_render(self):
@@ -132,7 +166,7 @@ class App:
             self.on_loop()
             self.on_render()
 
-            time.sleep(50.0/1000.0)
+            time.sleep(1.0/30.0)
         self.on_cleanup()
 
 if __name__ == "__main__":
