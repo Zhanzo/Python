@@ -4,7 +4,7 @@ import pygame
 
 
 class Apple(pygame.sprite.Sprite):
-    size = 40
+    size = 9
 
     def __init__(self, x, y):
         super().__init__()
@@ -17,11 +17,11 @@ class Apple(pygame.sprite.Sprite):
 
 
 class Segment(pygame.sprite.Sprite):
-    size = 40
+    size = 10
 
     def __init__(self, x, y):
         super().__init__()
-        self.image = pygame.Surface([self.size-3, self.size-3])
+        self.image = pygame.Surface([self.size-1, self.size-1])
         self.image.fill((255, 0, 0))
         # Make our top-left corner the passed-in location.
         self.rect = self.image.get_rect()
@@ -31,15 +31,15 @@ class Segment(pygame.sprite.Sprite):
 
 class Player():
     snake_segments = []
-    size = 37
-    margain = 3
+    size = 9
+    margain = 1
     x_change = size + margain
     y_change = 0
 
     def __init__(self, all_sprites_list):
         for i in range(0, 3):
-            x = 250 - (self.size + self.margain) * i
-            y = 30
+            x = 400 - (self.size + self.margain) * i
+            y = 300
             segment = Segment(x, y)
             self.snake_segments.append(segment)
             all_sprites_list.add(segment)
@@ -70,20 +70,24 @@ class Player():
         all_sprites_list.add(segment)
 
     def moveRight(self):
-        self.x_change = (self.size + self.margain)
-        self.y_change = 0
+        if (self.x_change == 0):
+            self.x_change = self.size + self.margain
+            self.y_change = 0
 
     def moveLeft(self):
-        self.x_change = (self.size + self.margain) * -1
-        self.y_change = 0
+        if (self.x_change == 0):
+            self.x_change = (self.size + self.margain) * -1
+            self.y_change = 0
 
     def moveUp(self):
-        self.x_change = 0
-        self.y_change = (self.size + self.margain) * -1
+        if (self.y_change == 0):
+            self.x_change = 0
+            self.y_change = (self.size + self.margain) * -1
 
     def moveDown(self):
-        self.x_change = 0
-        self.y_change = (self.size + self.margain)
+        if (self.y_change == 0):
+            self.x_change = 0
+            self.y_change = self.size + self.margain
 
 
 class Game:
@@ -98,17 +102,17 @@ class Game:
     def isWallCollision(self, snake_segment, size):
         if (snake_segment.rect.x > 800 or snake_segment.rect.x < 0):
             return True
-        elif (snake_segment.rect.y > 800 or snake_segment.rect.y < 0):
+        elif (snake_segment.rect.y > 600 or snake_segment.rect.y < 0):
             return True
         return False
 
 
 class App:
     window_width = 800
-    window_height = 800
+    window_height = 600
     player = None
     apple = None
-    size = 40
+    size = 10
 
     def __init__(self):
         self._running = True
@@ -116,7 +120,7 @@ class App:
         self.all_sprites_list = pygame.sprite.Group()
         self.game = Game()
         self.player = Player(self.all_sprites_list)
-        self.apple = Apple(400, 400)
+        self.apple = Apple(400, 300)
 
     def on_init(self):
         pygame.init()
@@ -150,8 +154,8 @@ class App:
 
             self.player.addSegment(self.all_sprites_list)
             self.all_sprites_list.remove(self.apple)
-            self.apple = Apple(randint(1, 10) * self.size,
-                               randint(1, 10) * self.size)
+            self.apple = Apple(randint(1, 79) * self.size,
+                               randint(1, 59) * self.size)
             self.all_sprites_list.add(self.apple)
 
         self.player.update(self.all_sprites_list)
@@ -182,7 +186,7 @@ class App:
                         self.player.moveDown()
             self.on_loop()
             self.on_render()
-            self.clock.tick(5)
+            self.clock.tick(30)
         self.on_cleanup()
 
 
