@@ -131,7 +131,7 @@ class App:
         self.all_sprites_list.add(self.apple)
         self.clock = pygame.time.Clock()
 
-    def on_event(self):
+    def on_exit(self):
         self._running = False
 
     def on_loop(self):
@@ -174,7 +174,7 @@ class App:
         while (self._running):
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    self.on_event()
+                    self.on_exit()
                 if event.type == pygame.KEYDOWN:
                     if (event.key == pygame.K_RIGHT):
                         self.player.moveRight()
@@ -184,6 +184,8 @@ class App:
                         self.player.moveUp()
                     if (event.key == pygame.K_DOWN):
                         self.player.moveDown()
+                    if (event.key == pygame.K_ESCAPE):
+                        self.on_exit()
             self.on_loop()
             self.on_render()
             self.clock.tick(30)
