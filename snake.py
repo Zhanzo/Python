@@ -17,11 +17,9 @@ class Apple(pygame.sprite.Sprite):
 
 
 class Segment(pygame.sprite.Sprite):
-    size = 10
-
-    def __init__(self, x, y):
+    def __init__(self, x, y, size):
         super().__init__()
-        self.image = pygame.Surface([self.size-1, self.size-1])
+        self.image = pygame.Surface([size, size])
         self.image.fill((255, 0, 0))
         # Make our top-left corner the passed-in location.
         self.rect = self.image.get_rect()
@@ -36,11 +34,11 @@ class Player():
     x_change = size + margain
     y_change = 0
 
-    def __init__(self, all_sprites_list):
+    def __init__(self, all_sprites_list, width, height):
         for i in range(0, 3):
-            x = 400 - (self.size + self.margain) * i
-            y = 300
-            segment = Segment(x, y)
+            x = width - (self.size + self.margain) * i
+            y = height
+            segment = Segment(x, y, self.size)
             self.snake_segments.append(segment)
             all_sprites_list.add(segment)
 
@@ -53,7 +51,7 @@ class Player():
         # Figure out where new segment will be
         x = self.snake_segments[0].rect.x + self.x_change
         y = self.snake_segments[0].rect.y + self.y_change
-        segment = Segment(x, y)
+        segment = Segment(x, y, self.size)
 
         # Insert new segment into the list
         self.snake_segments.insert(0, segment)
@@ -63,7 +61,7 @@ class Player():
         # Figure out where new segment will be
         x = self.snake_segments[0].rect.x + self.x_change
         y = self.snake_segments[0].rect.y + self.y_change
-        segment = Segment(x, y)
+        segment = Segment(x, y, self.size)
 
         # Insert new segment into the list
         self.snake_segments.insert(0, segment)
@@ -99,17 +97,17 @@ class Game:
                 return True
         return False
 
-    def isWallCollision(self, snake_segment, size):
-        if (snake_segment.rect.x > 800 or snake_segment.rect.x < 0):
+    def isWallCollision(self, snake_segment, size, width, height):
+        if (snake_segment.rect.x > width or snake_segment.rect.x < 0):
             return True
-        elif (snake_segment.rect.y > 600 or snake_segment.rect.y < 0):
+        elif (snake_segment.rect.y > height or snake_segment.rect.y < 0):
             return True
         return False
 
 
 class App:
-    window_width = 800
-    window_height = 600
+    window_width = 400
+    window_height = 400
     player = None
     apple = None
     size = 10
@@ -119,8 +117,9 @@ class App:
         self._screen = None
         self.all_sprites_list = pygame.sprite.Group()
         self.game = Game()
-        self.player = Player(self.all_sprites_list)
-        self.apple = Apple(400, 300)
+        self.player = Player(self.all_sprites_list, self.window_width/2,
+                                self.window_height/2)
+        self.apple = Apple(self.window_width/2, self.window_height/2)
 
     def on_init(self):
         pygame.init()
@@ -140,12 +139,13 @@ class App:
             if (self.game.isCollision(self.player.snake_segments[0],
                                       self.player.snake_segments[i],
                                       self.player.size)):
-                self.on_event()
+                self.on_exit()
 
         # does snake collide with wall?
         if (self.game.isWallCollision(self.player.snake_segments[0],
-                                      self.size)):
-            self.on_event()
+                                      self.size, self.window_width,
+                                      self.window_height)):
+            self.on_exit()
 
         # does snake eat apple?
         if (self.game.isCollision(self.apple,
@@ -154,8 +154,8 @@ class App:
 
             self.player.addSegment(self.all_sprites_list)
             self.all_sprites_list.remove(self.apple)
-            self.apple = Apple(randint(1, 79) * self.size,
-                               randint(1, 59) * self.size)
+            self.apple = Apple(randint(0, self.window_width/10-1) * self.size,
+                               randint(0, self.window_height/10-1) * self.size)
             self.all_sprites_list.add(self.apple)
 
         self.player.update(self.all_sprites_list)
@@ -188,7 +188,7 @@ class App:
                         self.on_exit()
             self.on_loop()
             self.on_render()
-            self.clock.tick(30)
+            self.clock.tick(20)
         self.on_cleanup()
 
 
