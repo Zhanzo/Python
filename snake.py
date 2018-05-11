@@ -98,9 +98,9 @@ class Game:
         return False
 
     def isWallCollision(self, snake_segment, size, width, height):
-        if (snake_segment.rect.x > width or snake_segment.rect.x < 0):
+        if (snake_segment.rect.x >= width or snake_segment.rect.x < 0):
             return True
-        elif (snake_segment.rect.y > height or snake_segment.rect.y < 0):
+        elif (snake_segment.rect.y >= height or snake_segment.rect.y < 0):
             return True
         return False
 
