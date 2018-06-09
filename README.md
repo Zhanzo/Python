@@ -1,4 +1,4 @@
-# PythonSnake 
+# Snake 
 A snake game written in Python using Pygame.
 
 ## main.py
