@@ -57,8 +57,10 @@ class App:
 
             self.player.add_segment(self.all_sprites_list)
             self.all_sprites_list.remove(self.apple)
-            self.apple = Apple(randint(0, self.window_width/10-1) * self.size,
-                               randint(0, self.window_height/10-1) * self.size,
+            self.apple = Apple(randint(0, self.window_width/10-1) * 
+					(self.size + self.margain),
+                               randint(0, self.window_height/10-1) * 
+					(self.size + self.margain),
                                self.size)
             self.all_sprites_list.add(self.apple)
 
